@@ -2,22 +2,32 @@
 const url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json";
 
 // Fetch the JSON data and console log it
-d3.json(url).then(function(data) {
-    console.log(data);
+d3.json(url).then((importedData) => {
+    console.log(importedData);
+    let data = importedData;
 
     // Create trace for bar chart
     let trace1 = {
-    x: data.samples[0]['sample_values'],
-    y: data.samples[0]['otu_ids'],
+    x: data.samples[0]['sample_values'].filter(function(d,i){ return i<10 }).reverse(),
+    y: data.samples[0]['otu_ids'].filter(function(d,i){ return i<10 }),
+    text: data.samples[0]['otu_labels'].filter(function(d,i){ return i<10 }),
+    name: data.samples[0]['otu_ids'].filter(function(d,i){ return i<10 }),
     type: "bar",
     orientation: "h"
     };
+    // Filtering code found at https://d3-graph-gallery.com/graph/basic_datamanipulation.html
 
     // Create bar chart
     let data1 = [trace1];
 
     let layout1 = {
-        title: `Top Microbial Species Found in Subject No. ${data.metadata[0]['id']}`
+        title: `Top Microbial Species Found in Subject No. ${data.metadata[0]['id']}`,
+        hovermode: "closest",
+        yaxis: {
+            autotypenumbers: "strict",
+            nticks: 10,
+            type: "category"
+        }
     };
   
     Plotly.newPlot("bar", data1, layout1);
@@ -29,8 +39,9 @@ d3.json(url).then(function(data) {
         y: data.samples[0]['sample_values'],
         type: "scatter",
         mode: "markers",
+        text: data.samples[0]['otu_labels'],
         marker: {
-            color: "red",
+            color: data.samples[0]['otu_ids'],
             size: data.samples[0]['sample_values']
         }
     };
@@ -39,7 +50,8 @@ d3.json(url).then(function(data) {
     let data2 = [trace2];
 
     let layout2 = {
-        title: `Counts of All Microbial Species Found in Subject No. ${data.metadata[0]['id']}`
+        title: `Counts of All Microbial Species Found in Subject No. ${data.metadata[0]['id']}`,
+        hovermode: "closest"
     };
     
     Plotly.newPlot("bubble", data2, layout2);
